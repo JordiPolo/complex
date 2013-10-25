@@ -33,6 +33,26 @@ defmodule Complex do
   end
 
   @doc """
+  Creates a new complex number given polar coordinates
+   ## Examples
+      iex> inspect Complex.from_polar(4, 0)
+      "4.0+0.0i"
+
+      iex> inspect Complex.from_polar(4, :math.pi/2)
+      "0.0+4.0i"
+
+      iex> inspect Complex.from_polar(3, :math.pi)
+      "-3.0+0.0i"
+  """
+
+  def from_polar(r, angle) do
+    real = r * round(:math.cos(angle), 1.0e-10)
+    i = r * round(:math.sin(angle), 1.0e-10)
+    new(real, i)
+  end
+
+
+  @doc """
   checks if a number is complex
   ## Examples
     iex> Complex.is_complex(Complex.new(1,2))
@@ -114,6 +134,7 @@ defmodule Complex do
   """
 
   def conj(complex) when is_record(complex, Number) do
+ #   new(complex)
     Number.new(real: complex.real, i: -complex.i)
   end
 
@@ -252,6 +273,51 @@ defmodule Complex do
     end
   end
 
+
+  @doc """
+  calculate the power of a complex number
+   ## Examples
+      iex> inspect Complex.power(Complex.new(3,3), 2)
+      "0.0+18.0i"
+
+      iex> inspect Complex.power(Complex.new(3,3), 0)
+      "1.0+0.0i"
+
+      iex> inspect Complex.power(Complex.new(4,4), -2)
+      "0.0-0.03125i"
+
+      iex> inspect Complex.power(5, 2)
+      "25.0+0.0i"
+
+  """
+  def power(x1, power) do
+    r = Complex.size(x1)
+    angle = argument(x1)
+    power_r = round(:math.pow(r, power), 1.0e-10)
+    power_angle = round(angle * power, 1.0e-10)
+    from_polar(power_r, power_angle)
+  end
+
+
+  @doc """
+  rounds a number to a given resolution
+   ## Examples
+      iex> Complex.round(3.1415912, 1.0e-4)
+      3.1416
+
+      iex> Complex.round(0.25, 1.0e-4)
+      0.25
+
+      iex> Complex.round(3.14158, 1.0e4)
+      0.0
+
+      iex> Complex.round(3.14158, 1)
+      3
+
+  """
+  defp round(number, resolution) do
+    round(number / resolution) * resolution
+  end
 
 end
 
