@@ -20,10 +20,12 @@ defmodule Complex do
   ## Examples
     iex> inspect Complex.new(2)
     "2+0i"
+    iex> inspect Complex.new(Complex.new(2,0))
+    "2+0i"
   """
   def new(r) do
     #TODO: handle non-numeric types
-    if is_complex(r) do
+    if is_record(r, Number) do
       r
     else
       Number.new(real: r, i: 0)
@@ -99,17 +101,25 @@ defmodule Complex do
   end
 
   @doc """
-  Adds two complex numbers
+  Returns the conjugate of the complex number
    ## Examples
-      iex> inspect Complex.add(Complex.new(1,2), Complex.new(1,2))
-      "2+4i"
+      iex> inspect Complex.conj(Complex.new(1,0))
+      "1+0i"
 
-      iex> inspect Complex.add(Complex.new(1,2), 5)
-      "6+2i"
+      iex> inspect Complex.conj(Complex.new(1,2))
+      "1-2i"
 
-      iex> inspect Complex.add(1,3)
-      "4+0i"
+      iex> inspect Complex.conj(3)
+      "3+0i"
   """
+
+  def conj(complex) when is_record(complex, Number) do
+    Number.new(real: complex.real, i: -complex.i)
+  end
+
+  def conj(number) when is_number(number) do
+    new(number)
+  end
 
   def add(x1, x2) do
     c1 = new(x1)
@@ -120,16 +130,16 @@ defmodule Complex do
   @doc """
   Substracts two complex numbers
    ## Examples
-      iex> inspect Complex.substract(Complex.new(1,2), Complex.new(1,2))
+      iex> inspect Complex.sub(Complex.new(1,2), Complex.new(1,2))
       "0+0i"
 
-      iex> inspect Complex.substract(Complex.new(1,2), 5)
+      iex> inspect Complex.sub(Complex.new(1,2), 5)
       "-4+2i"
 
-      iex> inspect Complex.substract(1,3)
+      iex> inspect Complex.sub(1,3)
       "-2+0i"
   """
-  def substract(x1, x2) do
+  def sub(x1, x2) do
     c1 = new(x1)
     c2 = new(x2)
     Number.new(real: c1.real - c2.real, i: c1.i - c2.i)
@@ -138,22 +148,111 @@ defmodule Complex do
   @doc """
   multiplies two complex numbers
    ## Examples
-      iex> inspect Complex.multiply(Complex.new(1,2), Complex.new(1,2))
+      iex> inspect Complex.mult(Complex.new(1,2), Complex.new(1,2))
       "-3+4i"
 
-      iex> inspect Complex.multiply(Complex.new(1,2), 5)
+      iex> inspect Complex.mult(Complex.new(1,2), 5)
       "5+10i"
 
-      iex> inspect Complex.multiply(1,3)
+      iex> inspect Complex.mult(1,3)
       "3+0i"
   """
-  def multiply(x1, x2) do
+  def mult(x1, x2) do
     c1 = new(x1)
     c2 = new(x2)
     real = (c1.real * c2.real) - (c1.i * c2.i)
     img = (c1.real * c2.i) + (c1.i * c2.real)
     Number.new(real: real, i: img)
   end
+
+  @doc """
+  divides two complex numbers
+   ## Examples
+      iex> inspect Complex.div(Complex.new(1,2), Complex.new(1,2))
+      "1.0+0.0i"
+
+      iex> inspect Complex.div(Complex.new(1,2), 5)
+      "0.2+0.4i"
+
+      iex> inspect Complex.div(3,1)
+      "3.0+0.0i"
+
+      iex> inspect Complex.div(6,Complex.new(3,1))
+      "1.8-0.6i"
+
+  """
+  def div(x1, x2) do
+    num = new(x1)
+    den = new(x2)
+    conjunction = conj(den)
+    result_num = mult(num, conjunction)
+    result_den = mult(den, conjunction)
+
+    real = result_num.real / result_den.real
+    img = result_num.i / result_den.real
+    Number.new(real: real, i: img)
+  end
+
+  @doc """
+  calculate the size of the polar representation of a complex number
+   ## Examples
+      iex> Complex.size(Complex.new(3,4))
+      5.0
+
+      iex> Complex.size(Complex.new(3,-4))
+      5.0
+
+      iex> Complex.size(5)
+      5.0
+  """
+
+  def size(x1) do
+    c1 = new(x1)
+    :math.sqrt(c1.real * c1.real + c1.i * c1.i)
+  end
+
+
+  @doc """
+  Returns the number when normalized as a vector with size 1
+   ## Examples
+      iex> inspect Complex.normalize(Complex.new(3,4))
+      "0.6+0.8i"
+
+      iex> inspect Complex.normalize(Complex.new(3,-4))
+      "0.6-0.8i"
+
+      iex> inspect Complex.normalize(5)
+      "1.0+0.0i"
+  """
+  def normalize(x1) do
+    c1 = new(x1)
+    size = Complex.size(x1)
+    Number.new(real: c1.real/size, i: c1.i/size)
+  end
+
+  @doc """
+  calculate the argument of the polar representation of a complex number
+   ## Examples
+      iex> Complex.argument(Complex.new(3,3)) / :math.pi
+      0.25
+
+      iex> Complex.argument(Complex.new(3,-3)) / :math.pi
+      -0.25
+
+      iex> Complex.argument(5)
+      0
+  """
+  def argument(x1) do
+    c1 = new(x1)
+    if c1.i == 0 do
+      0
+    else
+      c1 = normalize(x1)
+      :math.atan(c1.real/c1.i)
+    end
+  end
+
+
 end
 
 
@@ -165,10 +264,24 @@ defimpl Inspect, for: Complex.Number do
    ## Examples
        iex> inspect(Complex.new(1, 2))
        "1+2i"
+
+       iex> inspect(Complex.new(1, -2))
+       "1-2i"
+
+       iex> inspect(Complex.new(-1, -2))
+       "-1-2i"
    """
 
   def inspect(complex, opts) do
-    Kernel.inspect(Complex.real(complex), opts) <> "+" <> Kernel.inspect(Complex.i(complex), opts) <> "i"
+    Kernel.inspect(Complex.real(complex), opts) <> inspect_imaginary(complex, opts) <> "i"
+  end
+
+  defp inspect_imaginary(complex, opts) do
+    if Complex.i(complex) < 0 do
+      Kernel.inspect(Complex.i(complex), opts)
+    else
+      "+" <> Kernel.inspect(Complex.i(complex), opts)
+    end
   end
 end
 
