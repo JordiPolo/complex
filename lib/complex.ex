@@ -134,18 +134,31 @@ defmodule Complex do
   """
 
   def conj(complex) when is_record(complex, Number) do
- #   new(complex)
-    Number.new(real: complex.real, i: -complex.i)
+    new(complex.real, -complex.i)
   end
 
   def conj(number) when is_number(number) do
     new(number)
   end
 
+
+
+  @doc """
+  Adds two complex numbers
+   ## Examples
+      iex> inspect Complex.add(Complex.new(1,2), Complex.new(1,2))
+      "2+4i"
+
+      iex> inspect Complex.add(Complex.new(1,2), 5)
+      "6+2i"
+
+      iex> inspect Complex.add(1,3)
+      "4+0i"
+  """
   def add(x1, x2) do
     c1 = new(x1)
     c2 = new(x2)
-    Number.new(real: c1.real + c2.real, i: c1.i + c2.i)
+    new(c1.real + c2.real, c1.i + c2.i)
   end
 
   @doc """
@@ -163,7 +176,7 @@ defmodule Complex do
   def sub(x1, x2) do
     c1 = new(x1)
     c2 = new(x2)
-    Number.new(real: c1.real - c2.real, i: c1.i - c2.i)
+    new(c1.real - c2.real, c1.i - c2.i)
   end
 
   @doc """
@@ -183,7 +196,7 @@ defmodule Complex do
     c2 = new(x2)
     real = (c1.real * c2.real) - (c1.i * c2.i)
     img = (c1.real * c2.i) + (c1.i * c2.real)
-    Number.new(real: real, i: img)
+    new(real, img)
   end
 
   @doc """
@@ -211,7 +224,7 @@ defmodule Complex do
 
     real = result_num.real / result_den.real
     img = result_num.i / result_den.real
-    Number.new(real: real, i: img)
+    new(real, img)
   end
 
   @doc """
@@ -248,7 +261,7 @@ defmodule Complex do
   def normalize(x1) do
     c1 = new(x1)
     size = Complex.size(x1)
-    Number.new(real: c1.real/size, i: c1.i/size)
+    new(c1.real/size, c1.i/size)
   end
 
   @doc """
