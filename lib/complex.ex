@@ -135,6 +135,25 @@ defmodule Complex do
     Number.new(real: c1.real - c2.real, i: c1.i - c2.i)
   end
 
+  @doc """
+  multiplies two complex numbers
+   ## Examples
+      iex> inspect Complex.multiply(Complex.new(1,2), Complex.new(1,2))
+      "-3+4i"
+
+      iex> inspect Complex.multiply(Complex.new(1,2), 5)
+      "5+10i"
+
+      iex> inspect Complex.multiply(1,3)
+      "3+0i"
+  """
+  def multiply(x1, x2) do
+    c1 = new(x1)
+    c2 = new(x2)
+    real = (c1.real * c2.real) - (c1.i * c2.i)
+    img = (c1.real * c2.i) + (c1.i * c2.real)
+    Number.new(real: real, i: img)
+  end
 end
 
 
