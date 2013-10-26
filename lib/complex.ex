@@ -11,26 +11,48 @@ defmodule Complex do
     iex> inspect Complex.new(1,2)
     "1+2i"
   """
-  def new(r, i) do
+  def new(r, i) when is_number(r) and is_number(i) do
     Number.new(real: r, i: i)
   end
 
   @doc """
-  Converts a real number into a complex number
+  A number which is complex return itself
   ## Examples
-    iex> inspect Complex.new(2)
-    "2+0i"
     iex> inspect Complex.new(Complex.new(2,0))
     "2+0i"
   """
-  def new(r) do
-    #TODO: handle non-numeric types
-    if is_record(r, Number) do
-      r
-    else
-      Number.new(real: r, i: 0)
+  def new(r) when is_record(r, Number) do
+    r
+  end
+
+  @doc """
+  A number which is only real returns a complex number with no imaginary part
+  ## Examples
+    iex> inspect Complex.new(2)
+    "2+0i"
+  """
+  def new(r) when is_number(r) do
+    new(r, 0)
+  end
+
+  @doc """
+  checks if a number is complex
+  ## Examples
+    iex> Complex.is_complex(Complex.new(1,2))
+    true
+
+    iex> Complex.is_complex(3)
+    true
+
+    iex> Complex.is_complex("test")
+    false
+  """
+  defmacrop is_complex(x) do
+    quote do
+      is_record(unquote(x), Complex.Number) or is_number(unquote(x))
     end
   end
+
 
   @doc """
   Creates a new complex number given polar coordinates
@@ -45,33 +67,12 @@ defmodule Complex do
       "-3.0+0.0i"
   """
 
-  def from_polar(r, angle) do
+  def from_polar(r, angle) do #when is_numeric(r) and is_numeric(angle) do
     real = r * round(:math.cos(angle), 1.0e-10)
     i = r * round(:math.sin(angle), 1.0e-10)
     new(real, i)
   end
 
-
-  @doc """
-  checks if a number is complex
-  ## Examples
-    iex> Complex.is_complex(Complex.new(1,2))
-    true
-
-    iex> Complex.is_complex(3)
-    false
-
-    iex> Complex.is_complex("test")
-    false
-  """
-
-  def is_complex(complex) when is_record(complex, Number) do
-    complex.i != 0
-  end
-
-  def is_complex(_) do
-    false
-  end
 
   @doc """
   returns the real part of the complex number
@@ -155,7 +156,7 @@ defmodule Complex do
       iex> inspect Complex.add(1,3)
       "4+0i"
   """
-  def add(x1, x2) do
+  def add(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
     c2 = new(x2)
     new(c1.real + c2.real, c1.i + c2.i)
@@ -173,7 +174,7 @@ defmodule Complex do
       iex> inspect Complex.sub(1,3)
       "-2+0i"
   """
-  def sub(x1, x2) do
+  def sub(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
     c2 = new(x2)
     new(c1.real - c2.real, c1.i - c2.i)
@@ -191,7 +192,7 @@ defmodule Complex do
       iex> inspect Complex.mult(1,3)
       "3+0i"
   """
-  def mult(x1, x2) do
+  def mult(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
     c2 = new(x2)
     real = (c1.real * c2.real) - (c1.i * c2.i)
@@ -215,7 +216,7 @@ defmodule Complex do
       "1.8-0.6i"
 
   """
-  def div(x1, x2) do
+  def div(x1, x2) when is_complex(x1) and is_complex(x2) do
     num = new(x1)
     den = new(x2)
     conjunction = conj(den)
@@ -240,7 +241,7 @@ defmodule Complex do
       5.0
   """
 
-  def size(x1) do
+  def size(x1) when is_complex(x1) do
     c1 = new(x1)
     :math.sqrt(c1.real * c1.real + c1.i * c1.i)
   end
@@ -258,7 +259,7 @@ defmodule Complex do
       iex> inspect Complex.normalize(5)
       "1.0+0.0i"
   """
-  def normalize(x1) do
+  def normalize(x1) when is_complex(x1) do
     c1 = new(x1)
     size = Complex.size(x1)
     new(c1.real/size, c1.i/size)
@@ -303,7 +304,7 @@ defmodule Complex do
       "25.0+0.0i"
 
   """
-  def power(x1, power) do
+  def power(x1, power) when is_complex(x1) and is_number(power) do
     r = Complex.size(x1)
     angle = argument(x1)
     power_r = round(:math.pow(r, power), 1.0e-10)
@@ -328,9 +329,11 @@ defmodule Complex do
       3
 
   """
-  defp round(number, resolution) do
+  defp round(number, resolution) when is_number(number) and is_number(resolution) do
     round(number / resolution) * resolution
   end
+
+
 
 end
 
