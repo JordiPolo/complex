@@ -1,3 +1,22 @@
+
+defprotocol Complex.Conversion do
+  def to_complex(arg1, arg2//0)
+end
+
+
+defimpl Complex.Conversion, for: Number do
+  def to_complex(r, i) do
+     Complex.Number.new(real: r, i: i)
+  end
+end
+
+defimpl Complex.Conversion, for: Complex.Number do
+  def to_complex(arg1, _) do
+    arg1
+  end
+end
+
+
 defmodule Complex do
 
   defrecord Number, real: 0.0, i: 0.0
@@ -11,28 +30,22 @@ defmodule Complex do
     iex> inspect Complex.new(1,2)
     "1+2i"
   """
+
   def new(r, i) when is_number(r) and is_number(i) do
-    Number.new(real: r, i: i)
+    Complex.Conversion.to_complex(r, i)
   end
 
   @doc """
-  A number which is complex return itself
+  Convenience method to create based on one unknown number
   ## Examples
     iex> inspect Complex.new(Complex.new(2,0))
     "2+0i"
-  """
-  def new(r) when is_record(r, Number) do
-    r
-  end
 
-  @doc """
-  A number which is only real returns a complex number with no imaginary part
-  ## Examples
     iex> inspect Complex.new(2)
     "2+0i"
   """
-  def new(r) when is_number(r) do
-    new(r, 0)
+  def new(number_or_complex) do
+    Complex.Conversion.to_complex(number_or_complex)
   end
 
   @doc """
@@ -44,12 +57,18 @@ defmodule Complex do
     iex> Complex.is_complex(3)
     true
 
-    iex> Complex.is_complex("test")
+    iex> Complex.is_complex()
     false
   """
   defmacrop is_complex(x) do
-    quote do
-      is_record(unquote(x), Complex.Number) or is_number(unquote(x))
+    if __CALLER__.in_guard? do
+      quote do
+        is_record(unquote(x), Complex.Number) or is_number(unquote(x))
+      end
+    else
+      quote bind_quoted: [x: x] do
+        is_record(x, Complex.Number) or is_number(x)
+      end
     end
   end
 
@@ -333,10 +352,7 @@ defmodule Complex do
     round(number / resolution) * resolution
   end
 
-
-
 end
-
 
 
 defimpl Inspect, for: Complex.Number do
