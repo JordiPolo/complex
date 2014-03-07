@@ -3,8 +3,8 @@ defmodule Complex.Mixfile do
 
   def project do
     [ app: :complex,
-      version: "0.0.1",
-      elixir: "~> 0.10.3",
+      version: "0.0.2",
+      elixir: "~> 0.12.4",
       deps: deps ]
   end
 
@@ -16,6 +16,8 @@ defmodule Complex.Mixfile do
   # Returns the list of dependencies in the format:
   # { :foobar, "~> 0.1", git: "https://github.com/elixir-lang/foobar.git" }
   defp deps do
-    []
+    [
+      { :ex_doc, github: "elixir-lang/ex_doc" }
+    ]
   end
 end
