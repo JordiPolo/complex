@@ -13,7 +13,7 @@ This will create a number with real part 1 and imaginary part 2.
 
 You can do all kind of operations on this:
 
-```
+```Elixir
 Complex.real(number)
 1
 
@@ -25,9 +25,16 @@ Complex.argument(number)
 
 Complex.add(number, Complex.new(1,2))
 2+4i
-
 ```
 
 You can find more use-cases in the doctests.
 
 PRs welcomed!
+
+Development
+===========
+
+Added a Guardfile for development. To get started:
+
+    bundle install
+    guard
