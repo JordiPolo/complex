@@ -1,11 +1,14 @@
 defprotocol Complex.Conversion do
-  def to_complex(arg1, arg2//0)
+  def to_complex(arg1)
+  def to_complex(arg1, arg2)
 end
 
-
-defimpl Complex.Conversion, for: Number do
+defimpl Complex.Conversion, for: [Float, Integer] do
   def to_complex(r, i) do
      Complex.Number.new(real: r, i: i)
+  end
+  def to_complex(r) do
+   Complex.Number.new(real: r, i: 0)
   end
 end
 
@@ -13,8 +16,11 @@ defimpl Complex.Conversion, for: Complex.Number do
   def to_complex(arg1, _) do
     arg1
   end
-end
 
+  def to_complex(arg1) do
+    arg1
+  end
+end
 
 defmodule Complex do
   defrecord Number, real: 0.0, i: 0.0
@@ -27,7 +33,7 @@ defmodule Complex do
 
   ## Examples
 
-      iex> inspect Complex.new(1,2)
+      iex> inspect Complex.new(1, 2)
       "1+2i"
   """
 
@@ -103,10 +109,10 @@ defmodule Complex do
 
   ## Examples
 
-      iex> Complex.real(Complex.new(1,2))
+      iex> Complex.real(Complex.new(1, 2))
       1
 
-      iex> Complex.real(Complex.new(0,2))
+      iex> Complex.real(Complex.new(0, 2))
       0
 
       iex> Complex.real(3)
@@ -125,10 +131,10 @@ defmodule Complex do
 
   ## Examples
 
-      iex> Complex.imag(Complex.new(1,2))
+      iex> Complex.imag(Complex.new(1, 2))
       2
 
-      iex> Complex.imag(Complex.new(2,0))
+      iex> Complex.imag(Complex.new(2, 0))
       0
 
       iex> Complex.imag(3)
@@ -153,10 +159,10 @@ defmodule Complex do
   Returns the conjugate of the complex number
    ## Examples
 
-      iex> inspect Complex.conj(Complex.new(1,0))
+      iex> inspect Complex.conj(Complex.new(1, 0))
       "1+0i"
 
-      iex> inspect Complex.conj(Complex.new(1,2))
+      iex> inspect Complex.conj(Complex.new(1, 2))
       "1-2i"
 
       iex> inspect Complex.conj(3)
@@ -196,10 +202,10 @@ defmodule Complex do
   Substracts two complex numbers
    ## Examples
 
-      iex> inspect Complex.sub(Complex.new(1,2), Complex.new(1,2))
+      iex> inspect Complex.sub(Complex.new(1, 2), Complex.new(1, 2))
       "0+0i"
 
-      iex> inspect Complex.sub(Complex.new(1,2), 5)
+      iex> inspect Complex.sub(Complex.new(1, 2), 5)
       "-4+2i"
 
       iex> inspect Complex.sub(1,3)
@@ -405,11 +411,11 @@ defmodule Complex do
   defp round(number, resolution) when is_number(number) and is_number(resolution) do
     round(number / resolution) * resolution
   end
-
 end
 
-
 defimpl Inspect, for: Complex.Number do
+  import Inspect.Algebra
+  
   @doc """
   Represents a complex number as a string
 
@@ -424,16 +430,15 @@ defimpl Inspect, for: Complex.Number do
        "-1-2i"
    """
 
-  def inspect(complex, opts) do
-    Kernel.inspect(Complex.real(complex), opts) <> inspect_imaginary(complex, opts) <> "i"
+  def inspect(complex, _) do
+    "#{Complex.real(complex)}#{inspect_imaginary(complex)}i"
   end
 
-  defp inspect_imaginary(complex, opts) do
+  defp inspect_imaginary(complex) do
     if Complex.i(complex) < 0 do
-      Kernel.inspect(Complex.i(complex), opts)
+      Complex.i(complex)
     else
-      "+" <> Kernel.inspect(Complex.i(complex), opts)
+      "+#{Complex.i(complex)}"
     end
   end
 end
-
