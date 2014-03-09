@@ -1,6 +1,6 @@
 
 defprotocol Complex.Conversion do
-  def to_complex(arg1, arg2//0)
+  def to_complex(arg1, arg2\\0)
 end
 
 
@@ -214,14 +214,14 @@ defmodule Complex do
   @doc """
   multiplies two complex numbers
    ## Examples
-      iex> inspect Complex.mult(Complex.new(1,2), Complex.new(1,2))
-      "-3+4i"
+      iex> Complex.mult(Complex.new(1,2), Complex.new(1,2))
+      Complex.Number[real: -3, i: 4]
 
-      iex> inspect Complex.mult(Complex.new(1,2), 5)
-      "5+10i"
+      iex> Complex.mult(Complex.new(1,2), 5)
+      Complex.Number[real: 5, i: 10]
 
-      iex> inspect Complex.mult(1,3)
-      "3+0i"
+      iex> Complex.mult(1,3)
+      Complex.Number[real: 3, i: 0]
   """
   def mult(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
@@ -234,17 +234,17 @@ defmodule Complex do
   @doc """
   divides two complex numbers
    ## Examples
-      iex> inspect Complex.div(Complex.new(1,2), Complex.new(1,2))
-      "1.0+0.0i"
+      iex> Complex.div(Complex.new(1,2), Complex.new(1,2))
+      Complex.Number[real: 1.0, i: 0.0]
 
-      iex> inspect Complex.div(Complex.new(1,2), 5)
-      "0.2+0.4i"
+      iex> Complex.div(Complex.new(1,2), 5)
+      Complex.Number[real: 0.2, i: 0.4]
 
-      iex> inspect Complex.div(3,1)
-      "3.0+0.0i"
+      iex> Complex.div(3,1)
+      Complex.Number[real: 3.0, i: 0.0]
 
-      iex> inspect Complex.div(6,Complex.new(3,1))
-      "1.8-0.6i"
+      iex> Complex.div(6,Complex.new(3,1))
+      Complex.Number[real: 1.8, i: -0.6]
 
   """
   def div(x1, x2) when is_complex(x1) and is_complex(x2) do
@@ -281,14 +281,14 @@ defmodule Complex do
   @doc """
   Returns the number when normalized as a vector with size 1
    ## Examples
-      iex> inspect Complex.normalize(Complex.new(3,4))
-      "0.6+0.8i"
+      iex> Complex.normalize(Complex.new(3,4))
+      Complex.Number[real: 0.6, i: 0.8]
 
-      iex> inspect Complex.normalize(Complex.new(3,-4))
-      "0.6-0.8i"
+      iex> Complex.normalize(Complex.new(3,-4))
+      Complex.Number[real: 0.6, i: -0.8]
 
-      iex> inspect Complex.normalize(5)
-      "1.0+0.0i"
+      iex> Complex.normalize(5)
+      Complex.Number[real: 1.0, i: 0.0]
   """
   def normalize(x1) when is_complex(x1) do
     c1 = new(x1)
@@ -322,17 +322,17 @@ defmodule Complex do
   @doc """
   calculate the power of a complex number
    ## Examples
-      iex> inspect Complex.power(Complex.new(3,3), 2)
-      "0.0+18.0i"
+      iex> Complex.power(Complex.new(3,3), 2)
+      Complex.Number[real: 0.0, i: 18.0]
 
-      iex> inspect Complex.power(Complex.new(3,3), 0)
-      "1.0+0.0i"
+      iex> Complex.power(Complex.new(3,3), 0)
+      Complex.Number[real: 1.0, i: 0.0]
 
-      iex> inspect Complex.power(Complex.new(4,4), -2)
-      "0.0-0.03125i"
+      iex> Complex.power(Complex.new(4,4), -2)
+      Complex.Number[real: 0.0, i: -0.03125]
 
-      iex> inspect Complex.power(5, 2)
-      "25.0+0.0i"
+      iex> Complex.power(5, 2)
+      Complex.Number[real: 25.0, i: 0.0]
 
   """
   def power(x1, power) when is_complex(x1) and is_number(power) do
