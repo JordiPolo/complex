@@ -4,13 +4,7 @@ defprotocol Complex.Conversion do
 end
 
 
-defimpl Complex.Conversion, for: Integer do
-  def to_complex(r, i) do
-     Complex.Number.new(real: r, i: i)
-  end
-end
-
-defimpl Complex.Conversion, for: Float do
+defimpl Complex.Conversion, for: [Integer, Float] do
   def to_complex(r, i) do
      Complex.Number.new(real: r, i: i)
   end
