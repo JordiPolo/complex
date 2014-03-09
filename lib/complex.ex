@@ -4,7 +4,13 @@ defprotocol Complex.Conversion do
 end
 
 
-defimpl Complex.Conversion, for: Number do
+defimpl Complex.Conversion, for: Integer do
+  def to_complex(r, i) do
+     Complex.Number.new(real: r, i: i)
+  end
+end
+
+defimpl Complex.Conversion, for: Float do
   def to_complex(r, i) do
      Complex.Number.new(real: r, i: i)
   end
@@ -18,8 +24,12 @@ end
 
 
 defmodule Complex do
+  @typep complex :: Complex.Number
+  @typep real_complex :: number | Complex.Number
 
-  defrecord Number, real: 0.0, i: 0.0
+  defrecord Number, real: 0.0, i: 0.0 do
+    record_type real: number, i: number
+  end
   @moduledoc """
     A naive implementation of complex numbers.
   """
@@ -27,10 +37,10 @@ defmodule Complex do
   @doc """
   Creates a new complex number
   ## Examples
-    iex> inspect Complex.new(1,2)
-    "1+2i"
+    iex> Complex.new(1,2)
+    Complex.Number[real: 1, i: 2]
   """
-
+  @spec new(number, number) :: complex
   def new(r, i) when is_number(r) and is_number(i) do
     Complex.Conversion.to_complex(r, i)
   end
@@ -38,12 +48,13 @@ defmodule Complex do
   @doc """
   Convenience method to create based on one unknown number
   ## Examples
-    iex> inspect Complex.new(Complex.new(2,0))
-    "2+0i"
+    iex> Complex.new(Complex.new(2,0))
+    Complex.Number[real: 2, i: 0]
 
-    iex> inspect Complex.new(2)
-    "2+0i"
+    iex> Complex.new(2)
+    Complex.Number[real: 2, i: 0]
   """
+  @spec new(real_complex) :: complex
   def new(number_or_complex) do
     Complex.Conversion.to_complex(number_or_complex)
   end
@@ -76,16 +87,16 @@ defmodule Complex do
   @doc """
   Creates a new complex number given polar coordinates
    ## Examples
-      iex> inspect Complex.from_polar(4, 0)
-      "4.0+0.0i"
+      iex> Complex.from_polar(4, 0)
+      Complex.Number[real: 4.0, i: 0.0]
 
-      iex> inspect Complex.from_polar(4, :math.pi/2)
-      "0.0+4.0i"
+      iex> Complex.from_polar(4, :math.pi/2)
+      Complex.Number[real: 0.0, i: 4.0]
 
-      iex> inspect Complex.from_polar(3, :math.pi)
-      "-3.0+0.0i"
+      iex> Complex.from_polar(3, :math.pi)
+      Complex.Number[real: -3.0, i: 0.0]
   """
-
+  @spec from_polar(number, number) :: complex
   def from_polar(r, angle) do #when is_numeric(r) and is_numeric(angle) do
     real = r * round(:math.cos(angle), 1.0e-10)
     i = r * round(:math.sin(angle), 1.0e-10)
@@ -105,6 +116,7 @@ defmodule Complex do
       iex> Complex.real(3)
       3
   """
+  @spec real(real_complex) :: number
   def real(complex) when is_record(complex, Number) do
     complex.real
   end
@@ -143,16 +155,16 @@ defmodule Complex do
   @doc """
   Returns the conjugate of the complex number
    ## Examples
-      iex> inspect Complex.conj(Complex.new(1,0))
-      "1+0i"
+      iex> Complex.conj(Complex.new(1,0))
+      Complex.Number[real: 1, i: 0]
 
-      iex> inspect Complex.conj(Complex.new(1,2))
-      "1-2i"
+      iex> Complex.conj(Complex.new(1,2))
+      Complex.Number[real: 1, i: -2]
 
-      iex> inspect Complex.conj(3)
-      "3+0i"
+      iex> Complex.conj(3)
+      Complex.Number[real: 3, i: 0]
   """
-
+  @spec real(real_complex) :: number
   def conj(complex) when is_record(complex, Number) do
     new(complex.real, -complex.i)
   end
@@ -166,14 +178,14 @@ defmodule Complex do
   @doc """
   Adds two complex numbers
    ## Examples
-      iex> inspect Complex.add(Complex.new(1,2), Complex.new(1,2))
-      "2+4i"
+      iex> Complex.add(Complex.new(1,2), Complex.new(1,2))
+      Complex.Number[real: 2, i: 4]
 
-      iex> inspect Complex.add(Complex.new(1,2), 5)
-      "6+2i"
+      iex> Complex.add(Complex.new(1,2), 5)
+      Complex.Number[real: 6, i: 2]
 
-      iex> inspect Complex.add(1,3)
-      "4+0i"
+      iex> Complex.add(1,3)
+      Complex.Number[real: 4, i: 0]
   """
   def add(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
@@ -184,14 +196,14 @@ defmodule Complex do
   @doc """
   Substracts two complex numbers
    ## Examples
-      iex> inspect Complex.sub(Complex.new(1,2), Complex.new(1,2))
-      "0+0i"
+      iex> Complex.sub(Complex.new(1,2), Complex.new(1,2))
+      Complex.Number[real: 0, i: 0]
 
-      iex> inspect Complex.sub(Complex.new(1,2), 5)
-      "-4+2i"
+      iex> Complex.sub(Complex.new(1,2), 5)
+      Complex.Number[real: -4, i: 2]
 
-      iex> inspect Complex.sub(1,3)
-      "-2+0i"
+      iex> Complex.sub(1,3)
+      Complex.Number[real: -2, i: 0]
   """
   def sub(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
