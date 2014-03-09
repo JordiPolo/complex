@@ -307,7 +307,8 @@ defmodule Complex do
   end
 
   @doc """
-  calculate the argument of the polar representation of a complex number
+  Calculate the argument of the polar representation of a complex number.
+
    ## Examples
       iex> Complex.argument(Complex.new(3,3)) / :math.pi
       0.25
@@ -332,13 +333,14 @@ defmodule Complex do
   @doc """
   calculate the power of a complex number
    ## Examples
-      iex> inspect Complex.power(Complex.new(3,3), 2)
+
+      iex> inspect Complex.power(Complex.new(3, 3), 2)
       "0.0+18.0i"
 
-      iex> inspect Complex.power(Complex.new(3,3), 0)
+      iex> inspect Complex.power(Complex.new(3, 3), 0)
       "1.0+0.0i"
 
-      iex> inspect Complex.power(Complex.new(4,4), -2)
+      iex> inspect Complex.power(Complex.new(4, 4), -2)
       "0.0-0.03125i"
 
       iex> inspect Complex.power(5, 2)
@@ -354,32 +356,103 @@ defmodule Complex do
   end
 
   @doc """
-  Any real number a can be written as e^ln(a); so
+  From Ruby Complex lib:
 
-     a^(ix) = (e^ln(a))^(ix) 
-            = e^(ix*ln(a)) 
-            = cos(x*ln(a)) + i*sin(x*ln(a))
+static VALUE
+nucomp_expt(VALUE self, VALUE other)
 
-  We can extend this to complex exponents this way:
+{
+    if (k_numeric_p(other) && k_exact_zero_p(other))
+        return f_complex_new_bang1(CLASS_OF(self), ONE);
 
-     a^(x+iy) = a^x * a^(iy)
+    if (k_rational_p(other) && f_one_p(f_denominator(other)))
+        other = f_numerator(other); /* c14n */
 
-  To allow for complex bases, write the base in the
-  form a*e^(ib), and you find
+    if (k_complex_p(other)) {
+        get_dat1(other);
 
-     [a*e^(ib)]^z = a^z * e^(ib*z)
+        if (k_exact_zero_p(dat->imag))
+            other = dat->real; /* c14n */
+    }
+
+    if (k_complex_p(other)) {
+        VALUE r, theta, nr, ntheta;
+
+        get_dat1(other);
+
+        r = f_abs(self);
+        theta = f_arg(self);
+
+        nr = m_exp_bang(f_sub(f_mul(dat->real, m_log_bang(r)),
+                              f_mul(dat->imag, theta)));
+        ntheta = f_add(f_mul(theta, dat->real),
+                       f_mul(dat->imag, m_log_bang(r)));
+        return f_complex_polar(CLASS_OF(self), nr, ntheta);
+    }
+    if (k_fixnum_p(other)) {
+        if (f_gt_p(other, ZERO)) {
+            VALUE x, z;
+            long n;
+
+            x = self;
+            z = x;
+            n = FIX2LONG(other) - 1;
+
+            while (n) {
+                long q, r;
+
+                while (1) {
+                    get_dat1(x);
+
+                    q = n / 2;
+                    r = n % 2;
+
+                    if (r)
+                        break;
+
+                    x = nucomp_s_new_internal(CLASS_OF(self),
+                                       f_sub(f_mul(dat->real, dat->real),
+                                             f_mul(dat->imag, dat->imag)),
+                                       f_mul(f_mul(TWO, dat->real), dat->imag));
+                    n = q;
+                }
+                z = f_mul(z, x);
+                n--;
+            }
+            return z;
+        }
+        return f_expt(f_reciprocal(self), f_negate(other));
+    }
+    if (k_numeric_p(other) && f_real_p(other)) {
+        VALUE r, theta;
+
+        if (k_bignum_p(other))
+            rb_warn("in a**b, b may be too big");
+
+        r = f_abs(self);
+        theta = f_arg(self);
+
+        return f_complex_polar(CLASS_OF(self), f_expt(r, other),
+                               f_mul(theta, other));
+    }
+    return rb_num_coerce_bin(self, other, id_expt);
+}
+            
 
   """
 
   @doc """
   Calculate a float to the power of a complex number.
   ## Examples
+
       iex> power(:math.pi, Complex(1, 1))
       1.2983954757313
 
   """
-  def power(x, y) when is_number(x) and is_complex(y) do
-    
+  def power(a, z) when is_number(a) and is_complex(z) do
+    real = :math.pow(a, Complex.real(z)) + :math.cos(Complex.real(z) * :math.log(a))
+    imaginary = :math.sin(Complex.i(z) * :math.log(a))
+    Complex.new(real, imaginary)
   end
 
 
@@ -393,8 +466,10 @@ defmodule Complex do
   end
 
   @doc """
-  rounds a number to a given resolution
+  Rounds a number to a given resolution.
+
    ## Examples
+
       iex> Complex.round(3.1415912, 1.0e-4)
       3.1416
 
@@ -408,16 +483,15 @@ defmodule Complex do
       3
 
   """
-  defp round(number, resolution) when is_number(number) and is_number(resolution) do
+  def round(number, resolution) when is_number(number) and is_number(resolution) do
     round(number / resolution) * resolution
   end
 end
 
 defimpl Inspect, for: Complex.Number do
-  import Inspect.Algebra
   
   @doc """
-  Represents a complex number as a string
+  Represents a complex number as a string.
 
    ## Examples
        iex> inspect(Complex.new(1, 2))
@@ -442,3 +516,18 @@ defimpl Inspect, for: Complex.Number do
     end
   end
 end
+
+  # Any real number a can be written as e^ln(a); so
+
+  #    a^(ix) = (e^ln(a))^(ix) 
+  #           = e^(ix*ln(a)) 
+  #           = cos(x*ln(a)) + i*sin(x*ln(a))
+
+  # We can extend this to complex exponents this way:
+
+  #    a^(x + iy) = a^x * a^(iy)
+
+  # To allow for complex bases, write the base in the
+  # form a*e^(ib), and you find
+
+  #    [a*e^(ib)]^z = a^z * e^(ib*z)
