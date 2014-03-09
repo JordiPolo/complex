@@ -31,8 +31,9 @@ defmodule Complex do
   @doc """
   Creates a new complex number
   ## Examples
-    iex> Complex.new(1,2)
-    Complex.Number[real: 1, i: 2]
+
+      iex> inspect Complex.new(1, 2)
+      "1+2i"
   """
   @spec new(number, number) :: complex
   def new(r, i) when is_number(r) and is_number(i) do
@@ -41,12 +42,14 @@ defmodule Complex do
 
   @doc """
   Convenience method to create based on one unknown number
-  ## Examples
-    iex> Complex.new(Complex.new(2,0))
-    Complex.Number[real: 2, i: 0]
 
-    iex> Complex.new(2)
-    Complex.Number[real: 2, i: 0]
+  ## Example
+
+      iex> inspect Complex.new(Complex.new(2,0))
+      "2+0i"
+  
+      iex> inspect Complex.new(2)
+      "2+0i"
   """
   @spec new(real_complex) :: complex
   def new(number_or_complex) do
@@ -54,16 +57,17 @@ defmodule Complex do
   end
 
   @doc """
-  checks if a number is complex
+  Checks if a number is complex
   ## Examples
-    iex> Complex.is_complex(Complex.new(1,2))
-    true
 
-    iex> Complex.is_complex(3)
-    true
-
-    iex> Complex.is_complex()
-    false
+      iex> Complex.is_complex(Complex.new(1,2))
+      true
+  
+      iex> Complex.is_complex(3)
+      true
+  
+      iex> Complex.is_complex()
+      false
   """
   defmacrop is_complex(x) do
     if __CALLER__.in_guard? do
@@ -81,14 +85,15 @@ defmodule Complex do
   @doc """
   Creates a new complex number given polar coordinates
    ## Examples
-      iex> Complex.from_polar(4, 0)
-      Complex.Number[real: 4.0, i: 0.0]
 
-      iex> Complex.from_polar(4, :math.pi/2)
-      Complex.Number[real: 0.0, i: 4.0]
+      iex> inspect Complex.from_polar(4, 0)
+      "4.0+0.0i"
 
-      iex> Complex.from_polar(3, :math.pi)
-      Complex.Number[real: -3.0, i: 0.0]
+      iex> inspect Complex.from_polar(4, :math.pi/2)
+      "0.0+4.0i"
+
+      iex> inspect Complex.from_polar(3, :math.pi)
+      "-3.0+0.0i"
   """
   @spec from_polar(number, number) :: complex
   def from_polar(r, angle) do #when is_numeric(r) and is_numeric(angle) do
@@ -99,12 +104,14 @@ defmodule Complex do
 
 
   @doc """
-  returns the real part of the complex number
+  Returns the real part of the complex number.
+
   ## Examples
-      iex> Complex.real(Complex.new(1,2))
+
+      iex> Complex.real(Complex.new(1, 2))
       1
 
-      iex> Complex.real(Complex.new(0,2))
+      iex> Complex.real(Complex.new(0, 2))
       0
 
       iex> Complex.real(3)
@@ -120,12 +127,14 @@ defmodule Complex do
   end
 
   @doc """
-  returns the imaginary part of the complex number
+  Returns the imaginary part of the complex number.
+
   ## Examples
-      iex> Complex.imag(Complex.new(1,2))
+
+      iex> Complex.imag(Complex.new(1, 2))
       2
 
-      iex> Complex.imag(Complex.new(2,0))
+      iex> Complex.imag(Complex.new(2, 0))
       0
 
       iex> Complex.imag(3)
@@ -149,11 +158,9 @@ defmodule Complex do
   @doc """
   Returns the conjugate of the complex number
    ## Examples
-      iex> Complex.conj(Complex.new(1,0))
-      Complex.Number[real: 1, i: 0]
 
-      iex> Complex.conj(Complex.new(1,2))
-      Complex.Number[real: 1, i: -2]
+      iex> inspect Complex.conj(Complex.new(1, 0))
+      "1+0i"
 
       iex> Complex.conj(3)
       Complex.Number[real: 3, i: 0]
@@ -172,14 +179,15 @@ defmodule Complex do
   @doc """
   Adds two complex numbers
    ## Examples
-      iex> Complex.add(Complex.new(1,2), Complex.new(1,2))
-      Complex.Number[real: 2, i: 4]
 
-      iex> Complex.add(Complex.new(1,2), 5)
-      Complex.Number[real: 6, i: 2]
+      iex> inspect Complex.add(Complex.new(1,2), Complex.new(1,2))
+      "2+4i"
 
-      iex> Complex.add(1,3)
-      Complex.Number[real: 4, i: 0]
+      iex> inspect Complex.add(Complex.new(1,2), 5)
+      "6+2i"
+
+      iex> inspect Complex.add(1,3)
+      "4+0i"
   """
   def add(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
@@ -190,14 +198,15 @@ defmodule Complex do
   @doc """
   Substracts two complex numbers
    ## Examples
-      iex> Complex.sub(Complex.new(1,2), Complex.new(1,2))
-      Complex.Number[real: 0, i: 0]
 
-      iex> Complex.sub(Complex.new(1,2), 5)
-      Complex.Number[real: -4, i: 2]
+      iex> inspect Complex.sub(Complex.new(1, 2), Complex.new(1, 2))
+      "0+0i"
 
-      iex> Complex.sub(1,3)
-      Complex.Number[real: -2, i: 0]
+      iex> inspect Complex.sub(Complex.new(1, 2), 5)
+      "-4+2i"
+
+      iex> inspect Complex.sub(1,3)
+      "-2+0i"
   """
   def sub(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
@@ -208,14 +217,15 @@ defmodule Complex do
   @doc """
   multiplies two complex numbers
    ## Examples
-      iex> Complex.mult(Complex.new(1,2), Complex.new(1,2))
-      Complex.Number[real: -3, i: 4]
 
-      iex> Complex.mult(Complex.new(1,2), 5)
-      Complex.Number[real: 5, i: 10]
+      iex> inspect Complex.mult(Complex.new(1,2), Complex.new(1,2))
+      "-3+4i"
 
-      iex> Complex.mult(1,3)
-      Complex.Number[real: 3, i: 0]
+      iex> inspect Complex.mult(Complex.new(1,2), 5)
+      "5+10i"
+
+      iex> inspect Complex.mult(1,3)
+      "3+0i"
   """
   def mult(x1, x2) when is_complex(x1) and is_complex(x2) do
     c1 = new(x1)
@@ -228,17 +238,18 @@ defmodule Complex do
   @doc """
   divides two complex numbers
    ## Examples
-      iex> Complex.div(Complex.new(1,2), Complex.new(1,2))
-      Complex.Number[real: 1.0, i: 0.0]
 
-      iex> Complex.div(Complex.new(1,2), 5)
-      Complex.Number[real: 0.2, i: 0.4]
+      iex> inspect Complex.div(Complex.new(1,2), Complex.new(1,2))
+      "1.0+0.0i"
 
-      iex> Complex.div(3,1)
-      Complex.Number[real: 3.0, i: 0.0]
+      iex> inspect Complex.div(Complex.new(1,2), 5)
+      "0.2+0.4i"
 
-      iex> Complex.div(6,Complex.new(3,1))
-      Complex.Number[real: 1.8, i: -0.6]
+      iex> inspect Complex.div(3,1)
+      "3.0+0.0i"
+
+      iex> inspect Complex.div(6,Complex.new(3,1))
+      "1.8-0.6i"
 
   """
   def div(x1, x2) when is_complex(x1) and is_complex(x2) do
@@ -255,7 +266,8 @@ defmodule Complex do
 
   @doc """
   calculate the size of the polar representation of a complex number
-   ## Examples
+  ## Examples
+
       iex> Complex.size(Complex.new(3,4))
       5.0
 
@@ -274,15 +286,16 @@ defmodule Complex do
 
   @doc """
   Returns the number when normalized as a vector with size 1
-   ## Examples
-      iex> Complex.normalize(Complex.new(3,4))
-      Complex.Number[real: 0.6, i: 0.8]
+  ## Examples
 
-      iex> Complex.normalize(Complex.new(3,-4))
-      Complex.Number[real: 0.6, i: -0.8]
+      iex> inspect Complex.normalize(Complex.new(3,4))
+      "0.6+0.8i"
 
-      iex> Complex.normalize(5)
-      Complex.Number[real: 1.0, i: 0.0]
+      iex> inspect Complex.normalize(Complex.new(3,-4))
+      "0.6-0.8i"
+
+      iex> inspect Complex.normalize(5)
+      "1.0+0.0i"
   """
   def normalize(x1) when is_complex(x1) do
     c1 = new(x1)
@@ -291,7 +304,8 @@ defmodule Complex do
   end
 
   @doc """
-  calculate the argument of the polar representation of a complex number
+  Calculate the argument of the polar representation of a complex number.
+
    ## Examples
       iex> Complex.argument(Complex.new(3,3)) / :math.pi
       0.25
@@ -316,17 +330,18 @@ defmodule Complex do
   @doc """
   calculate the power of a complex number
    ## Examples
-      iex> Complex.power(Complex.new(3,3), 2)
-      Complex.Number[real: 0.0, i: 18.0]
 
-      iex> Complex.power(Complex.new(3,3), 0)
-      Complex.Number[real: 1.0, i: 0.0]
+      iex> inspect Complex.power(Complex.new(3, 3), 2)
+      "0.0+18.0i"
 
-      iex> Complex.power(Complex.new(4,4), -2)
-      Complex.Number[real: 0.0, i: -0.03125]
+      iex> inspect Complex.power(Complex.new(3, 3), 0)
+      "1.0+0.0i"
 
-      iex> Complex.power(5, 2)
-      Complex.Number[real: 25.0, i: 0.0]
+      iex> inspect Complex.power(Complex.new(4, 4), -2)
+      "0.0-0.03125i"
+
+      iex> inspect Complex.power(5, 2)
+      "25.0+0.0i"
 
   """
   def power(x1, power) when is_complex(x1) and is_number(power) do
@@ -339,8 +354,19 @@ defmodule Complex do
 
 
   @doc """
-  rounds a number to a given resolution
+  calculate a complex number to the power of a complex number
+     ## Examples
+
+  """
+  def power(x, y) when is_complex(x) and is_complex(y) do
+    
+  end
+
+  @doc """
+  Rounds a number to a given resolution.
+
    ## Examples
+
       iex> Complex.round(3.1415912, 1.0e-4)
       3.1416
 
@@ -354,12 +380,10 @@ defmodule Complex do
       3
 
   """
-  defp round(number, resolution) when is_number(number) and is_number(resolution) do
+  def round(number, resolution) when is_number(number) and is_number(resolution) do
     round(number / resolution) * resolution
   end
-
 end
-
 
 defimpl Inspect, for: Complex.Number do
   @doc """
@@ -376,16 +400,15 @@ defimpl Inspect, for: Complex.Number do
        "-1-2i"
    """
 
-  def inspect(complex, opts) do
-    Kernel.inspect(Complex.real(complex), opts) <> inspect_imaginary(complex, opts) <> "i"
+  def inspect(complex, _) do
+    "#{Complex.real(complex)}#{inspect_imaginary(complex)}i"
   end
 
-  defp inspect_imaginary(complex, opts) do
+  defp inspect_imaginary(complex) do
     if Complex.i(complex) < 0 do
-      Kernel.inspect(Complex.i(complex), opts)
+      Complex.i(complex)
     else
-      "+" <> Kernel.inspect(Complex.i(complex), opts)
+      "+#{Complex.i(complex)}"
     end
   end
 end
-
