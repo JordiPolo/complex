@@ -1,14 +1,12 @@
+
 defprotocol Complex.Conversion do
-  def to_complex(arg1)
-  def to_complex(arg1, arg2)
+  def to_complex(arg1, arg2\\0)
 end
 
-defimpl Complex.Conversion, for: [Float, Integer] do
+
+defimpl Complex.Conversion, for: [Integer, Float] do
   def to_complex(r, i) do
      Complex.Number.new(real: r, i: i)
-  end
-  def to_complex(r) do
-   Complex.Number.new(real: r, i: 0)
   end
 end
 
@@ -16,27 +14,28 @@ defimpl Complex.Conversion, for: Complex.Number do
   def to_complex(arg1, _) do
     arg1
   end
-
-  def to_complex(arg1) do
-    arg1
-  end
 end
 
+
 defmodule Complex do
-  defrecord Number, real: 0.0, i: 0.0
+  @typep complex :: Complex.Number
+  @typep real_complex :: number | Complex.Number
+
+  defrecord Number, real: 0.0, i: 0.0 do
+    record_type real: number, i: number
+  end
   @moduledoc """
     A naive implementation of complex numbers.
   """
 
   @doc """
-  Creates a new complex number 
-
+  Creates a new complex number
   ## Examples
 
       iex> inspect Complex.new(1, 2)
       "1+2i"
   """
-
+  @spec new(number, number) :: complex
   def new(r, i) when is_number(r) and is_number(i) do
     Complex.Conversion.to_complex(r, i)
   end
@@ -52,6 +51,7 @@ defmodule Complex do
       iex> inspect Complex.new(2)
       "2+0i"
   """
+  @spec new(real_complex) :: complex
   def new(number_or_complex) do
     Complex.Conversion.to_complex(number_or_complex)
   end
@@ -83,8 +83,7 @@ defmodule Complex do
 
 
   @doc """
-  Creates a new complex number given polar coordinates.
-
+  Creates a new complex number given polar coordinates
    ## Examples
 
       iex> inspect Complex.from_polar(4, 0)
@@ -96,7 +95,7 @@ defmodule Complex do
       iex> inspect Complex.from_polar(3, :math.pi)
       "-3.0+0.0i"
   """
-
+  @spec from_polar(number, number) :: complex
   def from_polar(r, angle) do #when is_numeric(r) and is_numeric(angle) do
     real = r * round(:math.cos(angle), 1.0e-10)
     i = r * round(:math.sin(angle), 1.0e-10)
@@ -118,6 +117,7 @@ defmodule Complex do
       iex> Complex.real(3)
       3
   """
+  @spec real(real_complex) :: number
   def real(complex) when is_record(complex, Number) do
     complex.real
   end
@@ -162,13 +162,10 @@ defmodule Complex do
       iex> inspect Complex.conj(Complex.new(1, 0))
       "1+0i"
 
-      iex> inspect Complex.conj(Complex.new(1, 2))
-      "1-2i"
-
-      iex> inspect Complex.conj(3)
-      "3+0i"
+      iex> Complex.conj(3)
+      Complex.Number[real: 3, i: 0]
   """
-
+  @spec real(real_complex) :: number
   def conj(complex) when is_record(complex, Number) do
     new(complex.real, -complex.i)
   end
@@ -489,9 +486,8 @@ nucomp_expt(VALUE self, VALUE other)
 end
 
 defimpl Inspect, for: Complex.Number do
-  
   @doc """
-  Represents a complex number as a string.
+  Represents a complex number as a string
 
    ## Examples
        iex> inspect(Complex.new(1, 2))

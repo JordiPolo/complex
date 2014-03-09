@@ -25,6 +25,7 @@ Complex.argument(number)
 
 Complex.add(number, Complex.new(1,2))
 2+4i
+
 ```
 
 You can find more use-cases in the doctests.
