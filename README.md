@@ -1,4 +1,6 @@
 # Complex
+[![Build
+Status](https://travis-ci.org/JordiPolo/complex.svg)](https://travis-ci.org/JordiPolo/complex)
 
 A library to manipulate complex numbers in Elixir.
 
